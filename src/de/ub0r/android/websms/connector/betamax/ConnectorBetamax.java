@@ -19,32 +19,29 @@
 package de.ub0r.android.websms.connector.betamax;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
+import java.io.StringReader;
+import java.util.ArrayList;
 
-import org.apache.http.HttpResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.http.message.BasicNameValuePair;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-
-import de.ub0r.android.websms.connector.common.Connector;
+import de.ub0r.android.websms.connector.common.BasicConnector;
 import de.ub0r.android.websms.connector.common.ConnectorCommand;
 import de.ub0r.android.websms.connector.common.ConnectorSpec;
+import de.ub0r.android.websms.connector.common.ConnectorSpec.SubConnectorSpec;
 import de.ub0r.android.websms.connector.common.Utils;
 import de.ub0r.android.websms.connector.common.WebSMSException;
-import de.ub0r.android.websms.connector.common.ConnectorSpec.SubConnectorSpec;
-
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -52,19 +49,26 @@ import org.xml.sax.SAXException;
  * 
  * @author flx
  */
-public class ConnectorBetamax extends Connector {
-	
+public class ConnectorBetamax extends BasicConnector {
+
 	/** Tag for debug output. */
 	private static final String TAG = "WebSMS.betamax";
 	/** SmsBug Gateway URL. */
 	private static final String URL_SEND = "/myaccount/sendsms.php";
 	/** SmsBug Gateway URL. */
 	private static final String URL_BALANCE = "/myaccount/getbalance.php";
+	
+	private static final String PARAM_USERNAME = "username";
+	private static final String PARAM_PASSWORD = "password";
+	private static final String PARAM_SENDER = "from";
+	private static final String PARAM_RECIPIENT = "to";
+	private static final String PARAM_TEXT = "text";
+
+	private String providerDomain;
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	public final ConnectorSpec initSpec(final Context context) {
 		final String name = context.getString(R.string.connector_betamax_name);
@@ -76,6 +80,12 @@ public class ConnectorBetamax extends Connector {
 				| ConnectorSpec.CAPABILITIES_PREFS);
 		//c.setValidCharacters(CharacterTable.getValidCharacters());
 		c.addSubConnector(TAG, name, SubConnectorSpec.FEATURE_MULTIRECIPIENTS);
+		
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		providerDomain = preferences.getString(Preferences.PREFS_DOMAIN, "");
+		Log.d(TAG, "updateSpec() providerDomain = "+providerDomain);
+
+		
 		return c;
 	}
 
@@ -96,149 +106,145 @@ public class ConnectorBetamax extends Connector {
 		} else {
 			connectorSpec.setStatus(ConnectorSpec.STATUS_INACTIVE);
 		}
+		
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		providerDomain = preferences.getString(Preferences.PREFS_DOMAIN, "");
+		Log.d(TAG, "updateSpec() providerDomain = "+providerDomain);
+		
 		return connectorSpec;
 	}
 
-	/**
-	 * Check return code from smsbug.com.
-	 * 
-	 * @param context
-	 *            {@link Context}
-	 * @param ret
-	 *            return code
-	 * @return true if no error code
-	 * @throws WebSMSException
-	 *             WebSMSException
-	 */
-	private boolean checkReturnCode(final Context context, final int ret)
-			throws WebSMSException {
-		Log.d(TAG, "ret=" + ret);
-		if (ret < 200) {
-			return true;
-		} else if (ret < 300) {
-			throw new WebSMSException(context, R.string.error_input);
-		} else {
-			if (ret == 401) {
-				throw new WebSMSException(context, R.string.error_pw);
-			}
-			throw new WebSMSException(context, R.string.error_server, // .
-					" " + ret);
-		}
+	@Override
+	protected String getUrlSend(ArrayList<BasicNameValuePair> d) {
+		StringBuilder url = new StringBuilder();
+		url.append("https://").append(providerDomain).append(URL_SEND);
+		return url.toString();
 	}
 
+	@Override
+	protected String getUrlBalance(ArrayList<BasicNameValuePair> d) {
+		StringBuilder url = new StringBuilder();
+		url.append("https://").append(providerDomain).append(URL_BALANCE);
+		return url.toString();
+	}
+
+	@Override
+	protected String getParamUsername() {
+		return PARAM_USERNAME;
+	}
+
+	@Override
+	protected String getParamPassword() {
+		return PARAM_PASSWORD;
+	}
+
+	@Override
+	protected String getParamRecipients() {
+		return PARAM_RECIPIENT;
+	}
+
+	@Override
+	protected String getParamText() {
+		return PARAM_TEXT;
+	}
+
+	@Override
+	protected String getParamSender() {
+		return PARAM_SENDER;
+	}
+
+	@Override
+	protected String getUsername(Context context, ConnectorCommand command,
+			ConnectorSpec cs) {
+		String userName = readFromPreferences(context, Preferences.PREFS_USER);
+		Log.d(TAG, "getUsername() = "+userName);
+		return userName;
+	}
+
+	@Override
+	protected String getPassword(Context context, ConnectorCommand command,
+			ConnectorSpec cs) {
+		return readFromPreferences(context, Preferences.PREFS_PASSWORD);
+	}
+
+	@Override
+	protected String getSender(Context context, ConnectorCommand command,
+			ConnectorSpec cs) {
+		String sender = Utils.getSender(context, command.getDefSender());
+		Log.d(TAG, "getSender() = "+sender);
+		return sender;
+	}
+
+	@Override
+	protected String getRecipients(ConnectorCommand command) {
+		String recipientsNumbers = Utils.joinRecipientsNumbers(Utils.national2international(command
+				.getDefPrefix(), command.getRecipients()), ";", true).replaceFirst("00", "+");
+		Log.d(TAG, "getRecipients() = "+recipientsNumbers);
+		return recipientsNumbers;
+	}
+	
+	private String readFromPreferences(Context context, String key) {
+		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		return prefs.getString(key, "");
+	}
+	
 	/**
-	 * Send data.
-	 * 
-	 * @param context
-	 *            {@link Context}
-	 * @param command
-	 *            {@link ConnectorCommand}
-	 * @throws WebSMSException
-	 *             WebSMSException
+	 * {@inheritDoc}
 	 */
-	private void sendData(final Context context, final ConnectorCommand command)
-			throws WebSMSException {
-		// do IO
-		try { // get Connection
-			final String text = command.getText();
-			final boolean checkOnly = (text == null || text.length() == 0);
-			final StringBuilder url = new StringBuilder();
-			final ConnectorSpec cs = this.getSpec(context);
-			final SharedPreferences p = PreferenceManager
-					.getDefaultSharedPreferences(context);
+	@Override
+	protected boolean usePost() {
+		return true;
+	}
+	
+	@Override
+	protected void doBootstrap(Context context, Intent intent)
+			throws IOException {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		providerDomain = preferences.getString(Preferences.PREFS_DOMAIN, "");
+		super.doBootstrap(context, intent);
+	}
 
-			url.append("https://");
-			url.append(p.getString(Preferences.PREFS_DOMAIN, "www.rynga.com"));
-
-			if (checkOnly) {
-				url.append(URL_BALANCE);
-			} else {
-				url.append(URL_SEND);
-			}
-			url.append("?from=");
-
-			url.append(URLEncoder.encode(Utils.getSender(context, command.getDefSender()))
-					.replace("+", ""));
-			url.append("&username=");
-			url.append(URLEncoder.encode(p.getString(Preferences.PREFS_USER, "")));
-			url.append("&password=");
-			url.append(URLEncoder.encode(p.getString(Preferences.PREFS_PASSWORD, "")));
-
-			if (!checkOnly) {
-				url.append("&text=");
-				url.append(URLEncoder.encode(text));
-				url.append("&to=");
-				url.append(URLEncoder.encode(Utils.national2international(command.getDefPrefix(),
-						Utils.getRecipientsNumber(command.getRecipients()[0]))
-						.substring(1)));
-
-			}
+	@Override
+	protected void parseResponse(Context context, ConnectorCommand command,
+			ConnectorSpec cs, String htmlText) {
 			
-			// send data
-			HttpResponse response = Utils.getHttpClient(url.toString(), null,
-					null, null, null);
-			int resp = response.getStatusLine().getStatusCode();
-			if (resp != HttpURLConnection.HTTP_OK) {
-				this.checkReturnCode(context, resp);
-				throw new WebSMSException(context, R.string.error_http, " "
-						+ resp);
+		final String text = command.getText();
+		
+		final boolean checkOnly = (text == null || text.length() == 0);
+		if (checkOnly) {
+			String[] lines = htmlText.split("\n");
+			htmlText = null;
+			for (String s : lines) {
+				cs.setBalance(s.replace("| &#8364;", "\u20AC"));
 			}
-			
-			
-			if (checkOnly) {
-				InputStream htmlStream = response.getEntity().getContent();
-				String htmlText = Utils.stream2str(htmlStream).trim();
-				String[] lines = htmlText.split("\n");
-				htmlText = null;
-				for (String s : lines) {
-					cs.setBalance(s.replace("| &#8364;", "\u20AC"));
-				}
-		    
-			} else {
-				// Parse XML response looking for resultstring value
-				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			    DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			    Document doc = dBuilder.parse(response.getEntity().getContent());
-			    doc.getDocumentElement().normalize();
-			    Integer nValue = Integer.parseInt(doc.getElementsByTagName("result").item(0).getChildNodes().item(0).getNodeValue());
-			    String nValueString = doc.getElementsByTagName("resultstring").item(0).getChildNodes().item(0).getNodeValue();
-
-				// Use WebSMSException for failure messages
-				if (nValue < 1) {
-					Log.d(TAG, "failed to send message via Betamax vendor, response following:");
-					Log.d(TAG, nValueString);
-					//Log.d(TAG, "Request following:");
-					//Log.d(TAG, url.toString());
-					
-					throw new WebSMSException(context, R.string.error_sending);
-				}
+			return;
+		}
+		
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	    DocumentBuilder dBuilder;
+	    
+		try {
+			dBuilder = dbFactory.newDocumentBuilder();
+			InputSource is = new InputSource();
+	        is.setCharacterStream(new StringReader(htmlText));
+			Document doc = dBuilder.parse(is);
+			doc.getDocumentElement().normalize();
+			Integer nValue = Integer.parseInt(doc.getElementsByTagName("result").item(0).getChildNodes().item(0).getNodeValue());
+			String nValueString = doc.getElementsByTagName("resultstring").item(0).getChildNodes().item(0).getNodeValue();
+			if (nValue < 1) {
+				Log.d(TAG, "failed to send message via Betamax vendor, response following:");
+				Log.d(TAG, nValueString);
+				throw new WebSMSException(context, R.string.error_sending);
 			}
-		} catch (IOException e) {
-			Log.e(TAG, null, e);
-			throw new WebSMSException(e.getMessage());
 		} catch (ParserConfigurationException e) {
 			Log.e(TAG, null, e);
+			throw new WebSMSException(context, R.string.error_sending_grave, "("+e.getClass().getName()+"");
 		} catch (SAXException e) {
 			Log.e(TAG, null, e);
+			throw new WebSMSException(context, R.string.error_sending_grave, "("+e.getClass().getName()+"");
+		} catch (IOException e) {
+			Log.e(TAG, null, e);
+			throw new WebSMSException(context, R.string.error_sending_grave, "("+e.getClass().getName()+"");
 		}
-
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected final void doUpdate(final Context context, final Intent intent)
-			throws WebSMSException {
-		this.sendData(context, new ConnectorCommand(intent));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected final void doSend(final Context context, final Intent intent)
-			throws WebSMSException {
-		this.sendData(context, new ConnectorCommand(intent));
 	}		 
 }

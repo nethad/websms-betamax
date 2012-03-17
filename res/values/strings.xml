@@ -28,4 +28,5 @@
 	<string name="domain_">Domain</string>
 	<string name="domain_hint">eg: www.rynga.com</string>
 	<string name="error_sending">Unable to send message. Check connector parameters.</string>
+	<string name="error_sending_grave">Unable to send message. Check connector parameters and try again later.</string>
 </resources>

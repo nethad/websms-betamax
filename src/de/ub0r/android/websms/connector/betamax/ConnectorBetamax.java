@@ -19,17 +19,9 @@
 package de.ub0r.android.websms.connector.betamax;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.http.message.BasicNameValuePair;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import android.content.Context;
 import android.content.Intent;
@@ -42,7 +34,6 @@ import de.ub0r.android.websms.connector.common.ConnectorSpec;
 import de.ub0r.android.websms.connector.common.ConnectorSpec.SubConnectorSpec;
 import de.ub0r.android.websms.connector.common.Utils;
 import de.ub0r.android.websms.connector.common.WebSMSException;
-
 
 /**
  * AsyncTask to manage IO to betamax API.
@@ -57,7 +48,7 @@ public class ConnectorBetamax extends BasicConnector {
 	private static final String URL_SEND = "/myaccount/sendsms.php";
 	/** SmsBug Gateway URL. */
 	private static final String URL_BALANCE = "/myaccount/getbalance.php";
-	
+
 	private static final String PARAM_USERNAME = "username";
 	private static final String PARAM_PASSWORD = "password";
 	private static final String PARAM_SENDER = "from";
@@ -78,14 +69,14 @@ public class ConnectorBetamax extends BasicConnector {
 		c.setCapabilities(ConnectorSpec.CAPABILITIES_UPDATE
 				| ConnectorSpec.CAPABILITIES_SEND
 				| ConnectorSpec.CAPABILITIES_PREFS);
-		//c.setValidCharacters(CharacterTable.getValidCharacters());
+		// c.setValidCharacters(CharacterTable.getValidCharacters());
 		c.addSubConnector(TAG, name, SubConnectorSpec.FEATURE_MULTIRECIPIENTS);
-		
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		providerDomain = preferences.getString(Preferences.PREFS_DOMAIN, "");
-		Log.d(TAG, "updateSpec() providerDomain = "+providerDomain);
 
-		
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		providerDomain = preferences.getString(Preferences.PREFS_DOMAIN, "");
+		Log.d(TAG, "updateSpec() providerDomain = " + providerDomain);
+
 		return c;
 	}
 
@@ -106,11 +97,12 @@ public class ConnectorBetamax extends BasicConnector {
 		} else {
 			connectorSpec.setStatus(ConnectorSpec.STATUS_INACTIVE);
 		}
-		
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(context);
 		providerDomain = preferences.getString(Preferences.PREFS_DOMAIN, "");
-		Log.d(TAG, "updateSpec() providerDomain = "+providerDomain);
-		
+		Log.d(TAG, "updateSpec() providerDomain = " + providerDomain);
+
 		return connectorSpec;
 	}
 
@@ -157,7 +149,7 @@ public class ConnectorBetamax extends BasicConnector {
 	protected String getUsername(Context context, ConnectorCommand command,
 			ConnectorSpec cs) {
 		String userName = readFromPreferences(context, Preferences.PREFS_USER);
-		Log.d(TAG, "getUsername() = "+userName);
+		Log.d(TAG, "getUsername() = " + userName);
 		return userName;
 	}
 
@@ -171,23 +163,26 @@ public class ConnectorBetamax extends BasicConnector {
 	protected String getSender(Context context, ConnectorCommand command,
 			ConnectorSpec cs) {
 		String sender = Utils.getSender(context, command.getDefSender());
-		Log.d(TAG, "getSender() = "+sender);
+		Log.d(TAG, "getSender() = " + sender);
 		return sender;
 	}
 
 	@Override
 	protected String getRecipients(ConnectorCommand command) {
-		String recipientsNumbers = Utils.joinRecipientsNumbers(Utils.national2international(command
-				.getDefPrefix(), command.getRecipients()), ";", true).replaceFirst("00", "+");
-		Log.d(TAG, "getRecipients() = "+recipientsNumbers);
+		String recipientsNumbers = Utils.joinRecipientsNumbers(
+				Utils.national2international(command.getDefPrefix(),
+						command.getRecipients()), ";", true).replaceFirst("00",
+				"+");
+		Log.d(TAG, "getRecipients() = " + recipientsNumbers);
 		return recipientsNumbers;
 	}
-	
+
 	private String readFromPreferences(Context context, String key) {
-		final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		final SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(context);
 		return prefs.getString(key, "");
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -195,11 +190,12 @@ public class ConnectorBetamax extends BasicConnector {
 	protected boolean usePost() {
 		return true;
 	}
-	
+
 	@Override
 	protected void doBootstrap(Context context, Intent intent)
 			throws IOException {
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(context);
 		providerDomain = preferences.getString(Preferences.PREFS_DOMAIN, "");
 		super.doBootstrap(context, intent);
 	}
@@ -207,9 +203,9 @@ public class ConnectorBetamax extends BasicConnector {
 	@Override
 	protected void parseResponse(Context context, ConnectorCommand command,
 			ConnectorSpec cs, String htmlText) {
-			
+
 		final String text = command.getText();
-		
+
 		final boolean checkOnly = (text == null || text.length() == 0);
 		if (checkOnly) {
 			String[] lines = htmlText.split("\n");
@@ -219,32 +215,15 @@ public class ConnectorBetamax extends BasicConnector {
 			}
 			return;
 		}
-		
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-	    DocumentBuilder dBuilder;
-	    
-		try {
-			dBuilder = dbFactory.newDocumentBuilder();
-			InputSource is = new InputSource();
-	        is.setCharacterStream(new StringReader(htmlText));
-			Document doc = dBuilder.parse(is);
-			doc.getDocumentElement().normalize();
-			Integer nValue = Integer.parseInt(doc.getElementsByTagName("result").item(0).getChildNodes().item(0).getNodeValue());
-			String nValueString = doc.getElementsByTagName("resultstring").item(0).getChildNodes().item(0).getNodeValue();
-			if (nValue < 1) {
-				Log.d(TAG, "failed to send message via Betamax vendor, response following:");
-				Log.d(TAG, nValueString);
-				throw new WebSMSException(context, R.string.error_sending);
-			}
-		} catch (ParserConfigurationException e) {
-			Log.e(TAG, null, e);
-			throw new WebSMSException(context, R.string.error_sending_grave, "("+e.getClass().getName()+"");
-		} catch (SAXException e) {
-			Log.e(TAG, null, e);
-			throw new WebSMSException(context, R.string.error_sending_grave, "("+e.getClass().getName()+"");
-		} catch (IOException e) {
-			Log.e(TAG, null, e);
-			throw new WebSMSException(context, R.string.error_sending_grave, "("+e.getClass().getName()+"");
+
+		boolean resultIs1 = htmlText.contains("<result>1</result>");
+		// boolean resultStringSuccess =
+		// htmlText.contains("<resultstring>success</resultstring>");
+		if (!resultIs1) {
+			Log.d(TAG,
+					"failed to send message via Betamax vendor, response following:");
+			Log.d(TAG, htmlText);
+			throw new WebSMSException(context, R.string.error_server);
 		}
-	}		 
+	}
 }

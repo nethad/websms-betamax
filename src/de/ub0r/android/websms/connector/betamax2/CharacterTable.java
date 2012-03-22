@@ -1,4 +1,4 @@
-package de.ub0r.android.websms.connector.betamax;
+package de.ub0r.android.websms.connector.betamax2;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -27,7 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
+//import android.util.Log;
 import de.ub0r.android.websms.connector.common.BasicConnector;
 import de.ub0r.android.websms.connector.common.ConnectorCommand;
 import de.ub0r.android.websms.connector.common.ConnectorSpec;
@@ -75,7 +75,7 @@ public class ConnectorBetamax extends BasicConnector {
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
 		providerDomain = preferences.getString(Preferences.PREFS_DOMAIN, "");
-		Log.d(TAG, "updateSpec() providerDomain = " + providerDomain);
+//		Log.d(TAG, "updateSpec() providerDomain = " + providerDomain);
 
 		return c;
 	}
@@ -101,7 +101,7 @@ public class ConnectorBetamax extends BasicConnector {
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
 		providerDomain = preferences.getString(Preferences.PREFS_DOMAIN, "");
-		Log.d(TAG, "updateSpec() providerDomain = " + providerDomain);
+//		Log.d(TAG, "updateSpec() providerDomain = " + providerDomain);
 
 		return connectorSpec;
 	}
@@ -149,7 +149,7 @@ public class ConnectorBetamax extends BasicConnector {
 	protected String getUsername(Context context, ConnectorCommand command,
 			ConnectorSpec cs) {
 		String userName = readFromPreferences(context, Preferences.PREFS_USER);
-		Log.d(TAG, "getUsername() = " + userName);
+//		Log.d(TAG, "getUsername() = " + userName);
 		return userName;
 	}
 
@@ -163,7 +163,7 @@ public class ConnectorBetamax extends BasicConnector {
 	protected String getSender(Context context, ConnectorCommand command,
 			ConnectorSpec cs) {
 		String sender = Utils.getSender(context, command.getDefSender());
-		Log.d(TAG, "getSender() = " + sender);
+//		Log.d(TAG, "getSender() = " + sender);
 		return sender;
 	}
 
@@ -173,7 +173,7 @@ public class ConnectorBetamax extends BasicConnector {
 				Utils.national2international(command.getDefPrefix(),
 						command.getRecipients()), ";", true).replaceFirst("00",
 				"+");
-		Log.d(TAG, "getRecipients() = " + recipientsNumbers);
+//		Log.d(TAG, "getRecipients() = " + recipientsNumbers);
 		return recipientsNumbers;
 	}
 
@@ -220,9 +220,9 @@ public class ConnectorBetamax extends BasicConnector {
 		// boolean resultStringSuccess =
 		// htmlText.contains("<resultstring>success</resultstring>");
 		if (!resultIs1) {
-			Log.d(TAG,
-					"failed to send message via Betamax vendor, response following:");
-			Log.d(TAG, htmlText);
+//			Log.d(TAG,
+//					"failed to send message via Betamax vendor, response following:");
+//			Log.d(TAG, htmlText);
 			throw new WebSMSException(context, R.string.error_server);
 		}
 	}

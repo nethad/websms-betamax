@@ -35,6 +35,10 @@ public final class Preferences extends PreferenceActivity {
 	static final String PREFS_PASSWORD = "password_betamax";
 	/** Preference's name: vendor's domain. */
 	static final String PREFS_DOMAIN = "domain_betamax";
+	
+	static final String PREFS_USE_DEFAULT_SENDER = "use_default_sender";
+	
+	static final String PREFS_CUSTOM_SENDER = "custom_sender";
 
 	/**
 	 * {@inheritDoc}

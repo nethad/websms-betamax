@@ -162,9 +162,13 @@ public class ConnectorBetamax extends BasicConnector {
 	@Override
 	protected String getSender(Context context, ConnectorCommand command,
 			ConnectorSpec cs) {
-		String sender = Utils.getSender(context, command.getDefSender());
+		boolean useDefaultSender = readBooleanFromPreferences(context, Preferences.PREFS_USE_DEFAULT_SENDER, true);
+		if (useDefaultSender) {
+			return Utils.getSender(context, command.getDefSender());
+		} else {
+			return readFromPreferences(context, Preferences.PREFS_CUSTOM_SENDER);
+		}
 //		Log.d(TAG, "getSender() = " + sender);
-		return sender;
 	}
 
 	@Override

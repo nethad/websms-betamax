@@ -186,13 +186,24 @@ public class ConnectorBetamax extends BasicConnector {
 				.getDefaultSharedPreferences(context);
 		return prefs.getString(key, "");
 	}
+	
+	private boolean readBooleanFromPreferences(Context context, String key, boolean defaultValue) {
+		final SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(context);
+		return prefs.getBoolean(key, defaultValue);
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	protected boolean usePost() {
-		return true;
+		return false;
+	}
+	
+	@Override
+	protected String getEncoding() {
+		return "UTF-8";
 	}
 
 	@Override

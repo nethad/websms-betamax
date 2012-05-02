@@ -1,0 +1,158 @@
+Check providers...
+Check www.voipcheap.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.voipbuster.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.12voip.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.dialnow.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.freecall.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.justvoip.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.lowratevoip.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.smsdiscount.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.voipwise.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.intervoip.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.poivy.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.voipbusterpro.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.voipstunt.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.webcalldirect.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.budgetsip.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.powervoip.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.voicetrading.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.voipblast.com
+HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+Check www.jumblo.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.rynga.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.telbo.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.actionvoip.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.smartvoip.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.easyvoip.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.voipmove.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.internetcalls.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.sipdiscount.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.voipdiscount.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.voipraider.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.freevoipdeal.com
+HTTP/1.0 404 Not Found
+HTTP/1.1 302 Found
+Check www.cosmovoip.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.budgetvoipcall.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.cheapbuzzer.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.callpirates.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.cheapvoipcall.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.dialcheap.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.discountcalling.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.frynga.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.globalfreecall.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.hotvoip.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.megavoip.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.pennyconnect.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.rebvoice.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.stuntcalls.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.voipblazer.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.voipcaptain.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.voipchief.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.voipjumper.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.voipsmash.com
+HTTP/1.0 404 Not Found
+HTTP/1.0 200 OK
+Check www.netappel.com
+Check www.voiparound.com
+Check www.sparvoip.com
+Check www.voiphit.com
+Check www.voipalot.com
+HTTP/1.1 404 Not Found
+HTTP/1.1 404 Not Found
+Check www.fastvoip.com
+HTTP/1.1 404 Not Found
+HTTP/1.1 404 Not Found

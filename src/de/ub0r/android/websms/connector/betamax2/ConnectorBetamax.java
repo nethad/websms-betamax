@@ -28,7 +28,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-//import android.util.Log;
+import android.util.Log;
 import de.ub0r.android.websms.connector.common.BasicConnector;
 import de.ub0r.android.websms.connector.common.ConnectorCommand;
 import de.ub0r.android.websms.connector.common.ConnectorSpec;
@@ -232,7 +232,9 @@ public class ConnectorBetamax extends BasicConnector {
 	}
 	
 	private boolean isBalanceSupported() {
-		return balanceChecks.isBalanceSupported(getUrlBalance(null), getEncoding());
+		boolean balanceSupported = balanceChecks.isBalanceSupported(getUrlBalance(null), getEncoding());
+		Log.d(TAG, String.format("balance supported = %s", balanceSupported));
+		return balanceSupported;
 	}
 
 	@Override
@@ -252,12 +254,7 @@ public class ConnectorBetamax extends BasicConnector {
 		}
 
 		boolean resultIs1 = htmlText.contains("<result>1</result>");
-		// boolean resultStringSuccess =
-		// htmlText.contains("<resultstring>success</resultstring>");
 		if (!resultIs1) {
-//			Log.d(TAG,
-//					"failed to send message via Betamax vendor, response following:");
-//			Log.d(TAG, htmlText);
 			throw new WebSMSException(context, R.string.error_server);
 		}
 	}

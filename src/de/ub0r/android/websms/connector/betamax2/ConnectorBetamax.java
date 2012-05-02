@@ -21,6 +21,7 @@ package de.ub0r.android.websms.connector.betamax2;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.message.BasicNameValuePair;
 
 import android.content.Context;
@@ -41,6 +42,8 @@ import de.ub0r.android.websms.connector.common.WebSMSException;
  * @author flx
  */
 public class ConnectorBetamax extends BasicConnector {
+	
+
 
 	/** Tag for debug output. */
 	private static final String TAG = "WebSMS.betamax";
@@ -56,6 +59,9 @@ public class ConnectorBetamax extends BasicConnector {
 	private static final String PARAM_TEXT = "text";
 
 	private String providerDomain;
+
+	
+	private BalanceChecks balanceChecks = new BalanceChecks();
 
 	/**
 	 * {@inheritDoc}
@@ -214,6 +220,20 @@ public class ConnectorBetamax extends BasicConnector {
 		providerDomain = preferences.getString(Preferences.PREFS_DOMAIN, "");
 		super.doBootstrap(context, intent);
 	}
+	
+	@Override
+	protected void doUpdate(final Context context, final Intent intent)
+			throws IOException {
+		if (providerDomain != null && isBalanceSupported()) {
+			super.doUpdate(context, intent);
+		} else {
+			this.getSpec(context).setBalance("?");
+		}
+	}
+	
+	private boolean isBalanceSupported() {
+		return balanceChecks.isBalanceSupported(getUrlBalance(null), getEncoding());
+	}
 
 	@Override
 	protected void parseResponse(Context context, ConnectorCommand command,
@@ -241,4 +261,5 @@ public class ConnectorBetamax extends BasicConnector {
 			throw new WebSMSException(context, R.string.error_server);
 		}
 	}
+
 }

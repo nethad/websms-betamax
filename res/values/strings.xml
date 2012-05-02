@@ -18,7 +18,7 @@
 	-->
 <resources>
 	<string name="app_name">WebSMS Connector: betamax</string>
-	<string name="app_version">1.4</string>
+	<string name="app_version">1.4.1</string>
 	<string name="connector_betamax_author">Thomas Ritter</string>
 	<string name="connector_betamax_name">betamax</string>
 	<string name="settings_betamax">Preferences - betamax</string>

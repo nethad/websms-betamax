@@ -1,0 +1,11 @@
+master:
+* change URL invocation from HTTP POST to GET
+* dynamically check if balance URL is working
+
+v1.4.0
+* fix encoding issues
+* enable custom sender
+* disable balance checks for providers (workaround)
+
+v1.3.0
+* first release, fork from old betamax connector
